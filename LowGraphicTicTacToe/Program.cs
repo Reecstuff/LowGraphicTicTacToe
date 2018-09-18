@@ -15,12 +15,7 @@ namespace LowGraphicTicTacToe
         /// </summary>
         static void Main()
         {
-            Console.OutputEncoding = Encoding.Unicode;
-            Console.WindowHeight = Console.LargestWindowHeight / 2;
-            Console.WindowWidth = Console.LargestWindowWidth / 2;
-
             StartScene.StartGame();
-
         }
     }
 }
