@@ -56,28 +56,36 @@ namespace LowGraphicTicTacToe.Scenes
 
             for (int i = 0; i < sGList.Count; i++)
             {
+                //Vertical and horizontal check 
                 if (sGList.Count(x => x.PosX == i) == GameRule.repeat || sGList.Count(y => y.PosY == i) == GameRule.repeat)
                 {
                     return true;
                 }
-                else if (sGList[i].PosX == sGList[i].PosY)
+                else
                 {
-                    winEqual++;
-
-                    if (winEqual == GameRule.repeat)
+                    //Diagonal check A
+                    if (sGList[i].PosX == sGList[i].PosY)
                     {
-                        return true;
+                        winEqual++;
+
+                        if (winEqual == GameRule.repeat)
+                        {
+                            return true;
+                        }
+                    }
+
+                    //Diagonal check B
+                    if ((sGList[i].PosX + sGList[i].PosY + 2) == checksum)
+                    {
+                        winCheck++;
+
+                        if (winCheck == GameRule.repeat)
+                        {
+                            return true;
+                        }
                     }
                 }
-                else if ((sGList[i].PosX + sGList[i].PosY) == checksum)
-                {
-                    winCheck++;
-
-                    if (winCheck == GameRule.repeat)
-                    {
-                        return true;
-                    }
-                }
+                
             }
 
             return false;
