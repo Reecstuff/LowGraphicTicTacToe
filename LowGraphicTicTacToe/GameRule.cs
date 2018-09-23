@@ -29,6 +29,9 @@ namespace LowGraphicTicTacToe
         /// <param name="nextPlayer">The next Player</param>
         public static Player nextPlayer;
 
+        /// <param name="middle">The middle of the board</param>
+        public static int middle;
+
         /// <summary>
         /// Changes the consolecolors
         /// </summary>
@@ -48,6 +51,5 @@ namespace LowGraphicTicTacToe
             }
             Console.BackgroundColor = color;
         }
-
     }
 }
