@@ -4,8 +4,7 @@ using System.Linq;
 namespace LowGraphicTicTacToe.Scenes
 {
     /// <summary>
-    /// Drawing the gameboard
-    /// and listen to userinput
+    ///Listen to userinput and Change the Game accordingly
     /// </summary>
     static class GameScene
     {
@@ -13,143 +12,76 @@ namespace LowGraphicTicTacToe.Scenes
         /// Listening to userinput
         /// </summary>
         /// <returns>Game finished or canceled</returns>
-        public static bool GameRun()
+        public static void GameRun()
         {
-            SaveGame sg;
-            switch (Console.ReadKey(true).Key)
+            ConsoleKey key = Console.ReadKey(true).Key;
+            switch (key)
             {
                 case ConsoleKey.UpArrow:
-                    if (GameRule.currentPlayer.PosY - 1 >= 0)
-                    {
-                        GameRule.currentPlayer.PosY -= 1;
-                        ConsoleDraw(GameRule.currentPlayer);
-                    }
+                    ChangePlayerPos(GameRule.currentPlayer.PosY - 1, key);
                     break;
                 case ConsoleKey.DownArrow:
-                    if (GameRule.currentPlayer.PosY + 1 <= GameRule.repeat - 1)
-                    {
-                        GameRule.currentPlayer.PosY += 1;
-                        ConsoleDraw(GameRule.currentPlayer);
-                    }
+                    ChangePlayerPos(GameRule.currentPlayer.PosY + 1, key);
                     break;
                 case ConsoleKey.LeftArrow:
-                    if (GameRule.currentPlayer.PosX - 1 >= 0)
-                    {
-                        GameRule.currentPlayer.PosX -= 1;
-                        ConsoleDraw(GameRule.currentPlayer);
-                    }
+                    ChangePlayerPos(GameRule.currentPlayer.PosX - 1, key);
                     break;
                 case ConsoleKey.RightArrow:
-                    if (GameRule.currentPlayer.PosX + 1 <= GameRule.repeat - 1)
-                    {
-                        GameRule.currentPlayer.PosX += 1;
-                        ConsoleDraw(GameRule.currentPlayer);
-                    }
+                    ChangePlayerPos(GameRule.currentPlayer.PosX + 1, key);
                     break;
                 case ConsoleKey.Enter:
-                    sg = GameRule.currentPlayer.PlayerSave.Concat(GameRule.nextPlayer.PlayerSave).ToList().Find(s => s.PosX == GameRule.currentPlayer.PosX && s.PosY == GameRule.currentPlayer.PosY);
-                    if (sg == null && !TurnEnd())
+                    if (!TurnEnd())
                     {
-                        return false;
+                        return;
                     }
-                    ConsoleDraw(GameRule.currentPlayer);
                     break;
                 case ConsoleKey.Escape:
-                    return false;
+                    return;
+                default:
+                    GameRun();
+                    break;
             }
-            return true;
+            GameRun();
         }
 
         /// <summary>
-        /// Draw squares to draw the Board
+        /// Changing the Playerposition by the pressed key
         /// </summary>
-        /// <remarks>
-        /// Draw playerposition and saved player selection
-        /// </remarks>
-        /// <param name="player">Current Player</param>
-        public static void ConsoleDraw(Player player)
+        /// <param name="pos">Changed Position were the Player want to go</param>
+        /// <param name="key">Pressed Key</param>
+        private static void ChangePlayerPos(int pos, ConsoleKey key)
         {
-            if (GameRule.repeat > 21)
+            if (OutOfBoard(pos))
             {
-                return;
-            }
-
-            int cursorX = 0;
-            int cursorY = 0;
-
-            ConsoleColor pencilcolour = ConsoleColor.Red;
-            Random randomColor = new Random();
-
-            Console.Clear();
-            for (int l = 0; l < GameRule.repeat; l++)
-            {
-                cursorX = 0;
-                cursorY = l * GameRule.sizeY;
-                for (int r = 0; r < GameRule.repeat; r++)
+                switch (key)
                 {
-                    cursorX = r * GameRule.sizeX;
-
-                    if (pencilcolour == ConsoleColor.Red)
-                    {
-                        pencilcolour += 2;
-
-                    }
-                    else
-                    {
-                        pencilcolour = ConsoleColor.Red;
-                    }
-
-                    GameRule.ChangeConsoleColor(pencilcolour);
-
-                    for (int y = cursorY; y < GameRule.sizeY + cursorY; y++)
-                    {
-                        for (int x = cursorX; x < GameRule.sizeX + cursorX; x++)
-                        {
-                            if (y == cursorY || y == GameRule.sizeY - 1 + cursorY || x <= cursorX + 1 || x >= GameRule.sizeX - 2 + cursorX)
-                            {
-                                DrawAt(GameRule.symbol, x, y);
-                            }
-                            else
-                            {
-                                SaveGame sg = GameRule.currentPlayer.PlayerSave.Concat(GameRule.nextPlayer.PlayerSave).ToList().Find(s => s.PosX == r && s.PosY == l);
-                                if (r == player.PosX && l == player.PosY)
-                                {
-                                    if (sg != null)
-                                    {
-                                        GameRule.ChangeConsoleColor(pencilcolour);
-                                    }
-                                    else
-                                    {
-                                        GameRule.ChangeConsoleColor(player.PlayerColor);
-                                    }
-                                    DrawAt(GameRule.symbol, x, y);
-                                }
-                                else if (sg != null)
-                                {
-                                    GameRule.ChangeConsoleColor(sg.FieldColor);
-                                    DrawAt(GameRule.symbol, x, y);
-                                }
-                                GameRule.ChangeConsoleColor(pencilcolour);
-                            }
-                        }
-                    }
+                    case ConsoleKey.UpArrow:
+                    case ConsoleKey.DownArrow:
+                        GameRule.currentPlayer.PosY = pos;
+                        break;
+                    case ConsoleKey.LeftArrow:
+                    case ConsoleKey.RightArrow:
+                        GameRule.currentPlayer.PosX = pos;
+                        break;
                 }
+
+                Render.ConsoleDraw(GameRule.currentPlayer);
             }
-            GameRule.ChangeConsoleColor(GameRule.currentPlayer.PlayerColor);
-            StartScene.FreeLines(2);
-            Console.WriteLine(string.Concat("It is ", GameRule.currentPlayer.PlayerName, "'s turn"));
         }
 
         /// <summary>
-        /// Draw a character at a specific position
+        /// Check if the Player wants to go out of the Board
         /// </summary>
-        /// <param name="c">Character</param>
-        /// <param name="x">X Postion</param>
-        /// <param name="y">Y Postion</param>
-        public static void DrawAt(char c, int x, int y)
+        /// <param name="pos">The Position the Player wants to go</param>
+        /// <returns>Is the Player out of the Board?</returns>
+        private static bool OutOfBoard(int pos)
         {
-            Console.SetCursorPosition(x, y);
-            Console.Write(c);
+            if (pos >= 0 && pos <= GameRule.repeat - 1)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -158,23 +90,31 @@ namespace LowGraphicTicTacToe.Scenes
         /// <returns>Is game over?</returns>
         private static bool TurnEnd()
         {
+            if (GameRule.currentPlayer.PlayerSave.Concat(GameRule.nextPlayer.PlayerSave).ToList().Find(s => s.PosX == GameRule.currentPlayer.PosX && s.PosY == GameRule.currentPlayer.PosY) != null)
+            {
+                return true;
+            }
             GameRule.currentPlayer.PlayerSave.Add(new SaveGame(GameRule.currentPlayer));
 
-            //Is it possible to win
-            if (GameRule.turn >= GameRule.repeat * 2 - 1)
+            //Check for wincondition
+            if (EndScene.CheckWin())
             {
-                //Check for wincondition
-                if (EndScene.CheckWin())
-                {
-                    return false;
-                }
+                return false;
             }
+
             GameRule.turn++;
 
             //Switch current player with next player
             Player bufferPlayer = GameRule.currentPlayer;
             GameRule.currentPlayer = GameRule.nextPlayer;
             GameRule.nextPlayer = bufferPlayer;
+
+            //Set Player in the middle of the field
+            GameRule.currentPlayer.PosX = GameRule.middle;
+            GameRule.currentPlayer.PosY = GameRule.middle;
+
+            //Render game
+            Render.ConsoleDraw(GameRule.currentPlayer);
             return true;
         }
     }

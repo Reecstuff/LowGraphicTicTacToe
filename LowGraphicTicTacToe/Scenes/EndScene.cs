@@ -10,20 +10,24 @@ namespace LowGraphicTicTacToe.Scenes
     static class EndScene
     {
         /// <summary>
-        /// If someone has one show the endmessage
+        /// If someone has won, show the endmessage
         /// </summary>
         /// <returns>If game has ended</returns>
         public static bool CheckWin()
         {
-            if (CheckEnumeration())
+            //Is it possible to win
+            if (GameRule.turn >= GameRule.repeat * 2 - 1)
             {
-                GameEnd(String.Join(" ", GameRule.currentPlayer.PlayerName, "has won the Game!"), GameRule.currentPlayer.PlayerColor);
-                return true;
-            }
-            else if (GameRule.turn == GameRule.repeat * GameRule.repeat)
-            {
-                GameEnd("DRAW!");
-                return true;
+                if (CheckEnumeration())
+                {
+                    GameEnd(String.Join(" ", GameRule.currentPlayer.PlayerName, "has won the Game!"), GameRule.currentPlayer.PlayerColor);
+                    return true;
+                }
+                else if (GameRule.turn == GameRule.repeat * GameRule.repeat)
+                {
+                    GameEnd("DRAW!");
+                    return true;
+                }
             }
 
             return false;
@@ -49,7 +53,7 @@ namespace LowGraphicTicTacToe.Scenes
         /// <returns>If current player finished the game</returns>
         private static bool CheckEnumeration()
         {
-            int checksum = Convert.ToInt32(Math.Ceiling((decimal)GameRule.repeat / 2)) * 2;
+            int checksum = (GameRule.middle + 1) * 2;
             int winEqual = 0;
             int winCheck = 0;
             List<SaveGame> sGList = GameRule.currentPlayer.PlayerSave.OrderBy(s => s.PosX).ThenBy(s => s.PosY).ToList();
@@ -85,11 +89,9 @@ namespace LowGraphicTicTacToe.Scenes
                         }
                     }
                 }
-                
             }
 
             return false;
         }
-
     }
 }

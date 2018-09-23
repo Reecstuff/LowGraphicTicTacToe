@@ -37,9 +37,9 @@ namespace LowGraphicTicTacToe.Scenes
 
                     //Gamestart
                     GameRule.turn = 1;
-                    GameScene.ConsoleDraw(GameRule.currentPlayer);
+                    Render.ConsoleDraw(GameRule.currentPlayer);
                     Console.WriteLine(String.Concat("\n", GameRule.currentPlayer.PlayerName, " is beginning"));
-                    while (GameScene.GameRun()) { }
+                    GameScene.GameRun();
 
                     //Going back to mainmenu
                     StartGame();
@@ -59,18 +59,21 @@ namespace LowGraphicTicTacToe.Scenes
         /// </summary>
         private static void CustomizeGame()
         {
-            String checkString;
+            string checkString;
             Console.Clear();
             Console.WriteLine("Please enter the Name of the first Player and confirm with ENTER");
             GameRule.ChangeConsoleColor(ConsoleColor.Yellow);
             checkString = Console.ReadLine().Trim();
-            GameRule.currentPlayer = new Player(checkString == String.Empty ? "Player1" : checkString, ConsoleColor.Blue);
+            GameRule.currentPlayer = new Player(checkString == String.Empty ? "Player1" : checkString, ConsoleColor.Cyan);
             Console.ResetColor();
             Console.WriteLine("Please enter the Name of the second Player and confirm with ENTER");
             GameRule.ChangeConsoleColor(ConsoleColor.Yellow);
             checkString = Console.ReadLine().Trim();
             GameRule.nextPlayer = new Player(checkString == String.Empty ? "Player2" : checkString, ConsoleColor.Green);
             Console.ResetColor();
+
+            //For custom Gamesizes
+            GameRule.middle = Convert.ToInt32(Math.Ceiling((decimal)GameRule.repeat / 2)) - 1;
         }
 
         /// <summary>

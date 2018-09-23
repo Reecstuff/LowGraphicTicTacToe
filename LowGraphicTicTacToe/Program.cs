@@ -1,6 +1,5 @@
 ﻿using LowGraphicTicTacToe.Scenes;
 using System;
-using System.Text;
 
 namespace LowGraphicTicTacToe
 {
@@ -15,7 +14,17 @@ namespace LowGraphicTicTacToe
         /// </summary>
         static void Main()
         {
-            StartScene.StartGame();
+            try
+            {
+                StartScene.StartGame();
+            }
+            catch (Exception)
+            {
+                GameRule.ChangeConsoleColor(ConsoleColor.Red);
+                Console.WriteLine("Fatal Error\n I'm sorry for the Inconveniences\nPress any Key to go back to the Mainmenu");
+                if (Console.ReadKey(true).Key != ConsoleKey.Escape)
+                    StartScene.StartGame();
+            }
         }
     }
 }
